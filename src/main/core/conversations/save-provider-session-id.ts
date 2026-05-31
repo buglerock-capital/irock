@@ -3,22 +3,15 @@ import { db } from '@main/db/client';
 import { conversations } from '@main/db/schema';
 import { events } from '@main/lib/events';
 import { log } from '@main/lib/logger';
-import {
-  isDroidProviderSessionId,
-  parseConversationConfig,
-  serializeConversationConfig,
-} from '@shared/conversation-config';
+import { parseConversationConfig, serializeConversationConfig } from '@shared/conversation-config';
 import { conversationChangedChannel } from '@shared/events/conversationEvents';
 
 export async function saveProviderSessionId(
   conversationId: string,
   providerSessionId: string
 ): Promise<void> {
-  if (!isDroidProviderSessionId(providerSessionId)) {
-    log.warn('saveProviderSessionId: ignored invalid Droid session id', {
-      conversationId,
-      providerSessionId,
-    });
+  if (!providerSessionId) {
+    log.warn('saveProviderSessionId: ignored empty provider session id', { conversationId });
     return;
   }
 
