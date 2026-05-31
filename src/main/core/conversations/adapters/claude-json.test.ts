@@ -92,6 +92,27 @@ describe('adaptClaudeEvent', () => {
       )
     ).toBeNull();
   });
+
+  it('returns null when assistant content contains only unrecognized block types', () => {
+    // An image block (or any future unknown type) produces no recognizable ChatBlock,
+    // so the adapter should return null rather than an empty-blocks message.
+    expect(
+      adaptClaudeEvent(
+        {
+          type: 'assistant',
+          message: { id: 'msg_x', role: 'assistant', content: [{ type: 'image', source: {} }] },
+        },
+        ctx
+      )
+    ).toBeNull();
+  });
+
+  it('returns null when assistant event has no content field (Fix 1 array guard)', () => {
+    // Claude may emit assistant events without a content key; guard must not throw.
+    expect(
+      adaptClaudeEvent({ type: 'assistant', message: { id: 'msg_y', role: 'assistant' } }, ctx)
+    ).toBeNull();
+  });
 });
 
 describe('extractSessionId', () => {

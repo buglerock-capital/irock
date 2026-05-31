@@ -1,4 +1,5 @@
 // src/main/core/conversations/adapters/claude-json.ts
+import { randomUUID } from 'node:crypto';
 import type { AgentProviderId } from '@shared/agent-provider-registry';
 import type { ChatBlock, ChatMessage } from '@shared/chat';
 
@@ -29,6 +30,8 @@ function blockFromContent(c: ClaudeContentBlock): ChatBlock | null {
       const command = typeof c.input.command === 'string' ? c.input.command : '';
       return { type: 'command', command, output: '', running: true };
     }
+    // Non-Bash tool uses are surfaced as activity blocks for now; the `tool_call`
+    // ChatBlock variant is reserved for a later phase.
     return { type: 'activity', label: c.name };
   }
   if (c.type === 'tool_result') {
@@ -37,8 +40,6 @@ function blockFromContent(c: ClaudeContentBlock): ChatBlock | null {
   }
   return null;
 }
-
-let toolCounter = 0;
 
 export function adaptClaudeEvent(raw: unknown, ctx: ClaudeAdapterContext): ChatMessage | null {
   if (!isRecord(raw) || typeof raw.type !== 'string') return null;
@@ -50,25 +51,25 @@ export function adaptClaudeEvent(raw: unknown, ctx: ClaudeAdapterContext): ChatM
   };
 
   if (ev.type === 'assistant' && isRecord(ev.message)) {
-    const blocks = ev.message.content
-      .map(blockFromContent)
-      .filter((b): b is ChatBlock => b !== null);
+    const content = Array.isArray(ev.message.content) ? ev.message.content : [];
+    const blocks = content.map(blockFromContent).filter((b): b is ChatBlock => b !== null);
     if (blocks.length === 0) return null;
     return { id: ev.message.id, role: 'assistant', blocks, status: 'complete', ...base };
   }
 
   if (ev.type === 'user' && isRecord(ev.message)) {
-    const blocks = ev.message.content
+    const content = Array.isArray(ev.message.content) ? ev.message.content : [];
+    const blocks = content
       .filter((c) => c.type === 'tool_result')
       .map(blockFromContent)
       .filter((b): b is ChatBlock => b !== null);
     if (blocks.length === 0) return null;
-    return { id: `tool_${(toolCounter += 1)}`, role: 'tool', blocks, status: 'complete', ...base };
+    return { id: `tool_${randomUUID()}`, role: 'tool', blocks, status: 'complete', ...base };
   }
 
   if (ev.type === 'result' && ev.is_error) {
     return {
-      id: `err_${(toolCounter += 1)}`,
+      id: `err_${randomUUID()}`,
       role: 'assistant',
       blocks: [{ type: 'error', message: ev.result ?? 'Agent error' }],
       status: 'error',
