@@ -21,7 +21,7 @@ export const ProjectsGroupLabel = observer(function ProjectsGroupLabel() {
 
   return (
     <div className="flex h-[40px] items-center justify-between pr-2.5 pl-5">
-      <MicroLabel className="text-foreground-tertiary-passive">Projects</MicroLabel>
+      <MicroLabel className="text-foreground-tertiary-passive">Workspaces</MicroLabel>
       <div className="flex items-center gap-1">
         <DropdownMenu>
           <Tooltip>
@@ -73,7 +73,7 @@ export const ProjectsGroupLabel = observer(function ProjectsGroupLabel() {
               <button
                 type="button"
                 onClick={() => showAddProjectModal({})}
-                aria-label="Add Project"
+                aria-label="Add Workspace"
                 className={buttonVariants({
                   size: 'icon-xs',
                   variant: 'ghost',
@@ -85,7 +85,7 @@ export const ProjectsGroupLabel = observer(function ProjectsGroupLabel() {
             }
           />
           <TooltipContent>
-            Add Project
+            Add Workspace
             <BoundShortcut settingsKey="newProject" variant="badge" />
           </TooltipContent>
         </Tooltip>

@@ -47,7 +47,7 @@ export const LeftSidebar: React.FC = observer(function LeftSidebar() {
       {isDragOver && (
         <div className="pointer-events-none absolute inset-0 z-50 flex flex-col items-center justify-center gap-2 bg-background-tertiary/80 backdrop-blur-sm">
           <FolderInput className="size-8 text-foreground" />
-          <span className="text-xs font-medium text-foreground">Drop to add project</span>
+          <span className="text-xs font-medium text-foreground">Drop to add workspace</span>
         </div>
       )}
       <SidebarSpace />

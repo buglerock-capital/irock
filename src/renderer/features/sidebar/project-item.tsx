@@ -151,7 +151,7 @@ export const SidebarProjectItem = observer(function SidebarProjectItem({
               </SidebarItemMiniButton>
             )}
             <SidebarMenuAction
-              aria-label={`Open project ${projectLabel}`}
+              aria-label={`Open workspace ${projectLabel}`}
               className={cn(
                 'truncate transition-colors select-none',
                 projectViewKind(getProjectStore(projectId)) === 'bootstrapping' &&

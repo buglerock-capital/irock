@@ -109,18 +109,18 @@ function ProjectPathNotFoundPanel({ path, projectId }: { path: string; projectId
       <div className="flex max-w-sm flex-col items-center gap-3 text-center">
         <TriangleAlert className="h-6 w-6 text-foreground-destructive" />
         <p className="font-mono text-sm font-medium text-foreground-destructive">
-          Project not found
+          Workspace not found
         </p>
         {path && <p className="font-mono text-xs break-all text-foreground-passive">{path}</p>}
         <p className="text-xs text-foreground-passive">
-          The project directory no longer exists at the configured path.
+          The workspace folder no longer exists at the configured path.
         </p>
         <button
           type="button"
           className="mt-2 text-xs text-foreground-destructive underline underline-offset-2 transition-colors hover:text-foreground-destructive/80"
           onClick={() => void getProjectManagerStore().deleteProject(projectId)}
         >
-          Remove Project
+          Remove Workspace
         </button>
       </div>
     </div>
