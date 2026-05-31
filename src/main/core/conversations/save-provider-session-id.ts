@@ -3,18 +3,17 @@ import { db } from '@main/db/client';
 import { conversations } from '@main/db/schema';
 import { events } from '@main/lib/events';
 import { log } from '@main/lib/logger';
-import { parseConversationConfig, serializeConversationConfig } from '@shared/conversation-config';
+import {
+  isDroidProviderSessionId,
+  parseConversationConfig,
+  serializeConversationConfig,
+} from '@shared/conversation-config';
 import { conversationChangedChannel } from '@shared/events/conversationEvents';
 
-export async function saveProviderSessionId(
+async function writeProviderSessionId(
   conversationId: string,
   providerSessionId: string
 ): Promise<void> {
-  if (!providerSessionId) {
-    log.warn('saveProviderSessionId: ignored empty provider session id', { conversationId });
-    return;
-  }
-
   const [row] = await db
     .select({
       config: conversations.config,
@@ -46,4 +45,28 @@ export async function saveProviderSessionId(
     projectId: row.projectId,
     changes: { providerSessionId },
   });
+}
+
+export async function saveProviderSessionId(
+  conversationId: string,
+  providerSessionId: string
+): Promise<void> {
+  if (!isDroidProviderSessionId(providerSessionId)) {
+    log.warn('saveProviderSessionId: ignored invalid Droid session id', {
+      conversationId,
+      providerSessionId,
+    });
+    return;
+  }
+
+  await writeProviderSessionId(conversationId, providerSessionId);
+}
+
+export async function persistChatProviderSessionId(
+  conversationId: string,
+  providerSessionId: string
+): Promise<void> {
+  if (!providerSessionId) return;
+
+  await writeProviderSessionId(conversationId, providerSessionId);
 }

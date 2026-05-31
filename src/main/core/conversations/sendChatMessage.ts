@@ -15,7 +15,7 @@ import { chatMessageChannel } from '@shared/events/chatEvents';
 import { runHeadlessTurn } from './impl/headless-runner';
 import { resolveTurnCwd } from './impl/resolve-turn-cwd';
 import { insertChatMessage } from './messages/message-store';
-import { saveProviderSessionId } from './save-provider-session-id';
+import { persistChatProviderSessionId } from './save-provider-session-id';
 
 export type SendChatMessageParams = {
   conversationId: string;
@@ -89,6 +89,6 @@ export async function sendChatMessage(params: SendChatMessageParams): Promise<vo
   );
 
   if (result.sessionId && result.sessionId !== priorSessionId) {
-    await saveProviderSessionId(params.conversationId, result.sessionId).catch(() => {});
+    await persistChatProviderSessionId(params.conversationId, result.sessionId).catch(() => {});
   }
 }
