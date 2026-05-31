@@ -9,19 +9,21 @@ function firstText(message: ChatMessage): string {
 }
 
 export async function insertChatMessage(message: ChatMessage): Promise<void> {
+  const content = firstText(message);
+  const metadata = JSON.stringify(message);
   await db
     .insert(messages)
     .values({
       id: message.id,
       conversationId: message.conversationId,
-      content: firstText(message),
+      content,
       sender: message.role,
       timestamp: message.createdAt,
-      metadata: JSON.stringify(message),
+      metadata,
     })
     .onConflictDoUpdate({
       target: messages.id,
-      set: { content: firstText(message), metadata: JSON.stringify(message) },
+      set: { content, sender: message.role, timestamp: message.createdAt, metadata },
     });
 }
 
