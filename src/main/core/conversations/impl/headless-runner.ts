@@ -30,7 +30,7 @@ export function runHeadlessTurn(
   return new Promise<HeadlessTurnResult>((resolve, reject) => {
     const child = spawn(input.command, input.args, {
       cwd: input.cwd,
-      env: { ...process.env, ...input.env },
+      env: input.env,
     });
     let buffer = '';
     let sessionId: string | null = null;
