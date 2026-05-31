@@ -4,6 +4,7 @@ import { buildAgentEnv } from '@main/core/pty/pty-env';
 import { db } from '@main/db/client';
 import { conversations } from '@main/db/schema';
 import { events } from '@main/lib/events';
+import { log } from '@main/lib/logger';
 import {
   getProvider,
   isValidProviderId,
@@ -33,7 +34,15 @@ export async function sendChatMessage(params: SendChatMessageParams): Promise<vo
   if (!conv) throw new Error(`Conversation ${params.conversationId} not found`);
 
   const rawProvider = conv.provider ?? 'claude';
-  const providerId: AgentProviderId = isValidProviderId(rawProvider) ? rawProvider : 'claude';
+  let providerId: AgentProviderId;
+  if (isValidProviderId(rawProvider)) {
+    providerId = rawProvider;
+  } else {
+    log.warn('chat: unknown provider on conversation, defaulting to claude', {
+      provider: conv.provider,
+    });
+    providerId = 'claude';
+  }
 
   const providerDef = getProvider(providerId);
   if (!providerDef?.headlessArgs) {
@@ -78,7 +87,9 @@ export async function sendChatMessage(params: SendChatMessageParams): Promise<vo
     },
     {
       onMessage: (message) => {
-        void insertChatMessage(message);
+        insertChatMessage(message).catch((err: unknown) =>
+          log.warn('chat: failed to persist agent message', { err })
+        );
         events.emit(chatMessageChannel, {
           conversationId: params.conversationId,
           taskId: params.taskId,
@@ -89,6 +100,8 @@ export async function sendChatMessage(params: SendChatMessageParams): Promise<vo
   );
 
   if (result.sessionId && result.sessionId !== priorSessionId) {
-    await persistChatProviderSessionId(params.conversationId, result.sessionId).catch(() => {});
+    await persistChatProviderSessionId(params.conversationId, result.sessionId).catch(
+      (err: unknown) => log.warn('chat: failed to persist provider session id', { err })
+    );
   }
 }
