@@ -7,7 +7,6 @@ import { useAppSettingsKey } from '@renderer/features/settings/use-app-settings-
 import { conversationRegistry } from '@renderer/features/tasks/stores/conversation-registry';
 import { getTaskStore, getTaskView } from '@renderer/features/tasks/stores/task-selectors';
 import { commandRegistry } from '@renderer/lib/commands/registry';
-import { FileIcon } from '@renderer/lib/editor/file-icon';
 import { useDebounce } from '@renderer/lib/hooks/useDebounce';
 import { getEffectiveHotkey } from '@renderer/lib/hooks/useKeyboardShortcuts';
 import { rpc } from '@renderer/lib/ipc';
@@ -100,26 +99,6 @@ function PaletteItem({
           />
         </>
       )}
-    </Command.Item>
-  );
-}
-
-function PaletteFileItem({
-  value,
-  item,
-  onSelect,
-}: {
-  value: string;
-  item: SearchItem;
-  onSelect: () => void;
-}) {
-  return (
-    <Command.Item value={value} onSelect={onSelect} className={PALETTE_ITEM_CLASS}>
-      <FileIcon filename={item.title} size={14} />
-      <span className="flex min-w-0 flex-1 items-baseline gap-2 overflow-hidden">
-        <span className="shrink-0">{item.title}</span>
-        <span className="truncate text-xs text-foreground/40">{item.subtitle}</span>
-      </span>
     </Command.Item>
   );
 }
@@ -253,18 +232,10 @@ export function CommandPaletteModal({
     navigate('task', { projectId: item.projectId, taskId: item.taskId });
   };
 
-  const handleOpenFile = (item: SearchItem) => {
-    if (!item.projectId || !item.taskId) return;
-    getTaskView(item.projectId, item.taskId)?.tabManager.openFile(item.id);
-    handleClose();
-    navigate('task', { projectId: item.projectId, taskId: item.taskId });
-  };
-
   const handleSelect = (item: SearchItem) => {
     if (item.kind === 'task') return handleNavigateToTask(item);
     if (item.kind === 'project') return handleNavigateToProject(item);
     if (item.kind === 'conversation') return handleNavigateToConversation(item);
-    if (item.kind === 'file') return handleOpenFile(item);
   };
 
   const handleResourceMonitorBack = useCallback(() => {
@@ -384,14 +355,7 @@ export function CommandPaletteModal({
                 }
               }
               if (item.kind === 'file') {
-                return (
-                  <PaletteFileItem
-                    key={`file:${item.id}`}
-                    value={`file:${item.id}`}
-                    item={item}
-                    onSelect={() => handleOpenFile(item)}
-                  />
-                );
+                return null;
               }
               return (
                 <PaletteItem

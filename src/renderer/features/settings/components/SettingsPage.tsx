@@ -4,8 +4,6 @@ import { PageHeader } from '@renderer/lib/components/page-header';
 import { rpc } from '@renderer/lib/ipc';
 import { cn } from '@renderer/utils/utils';
 import { AccountTab } from './AccountTab';
-import { CliAgentsList } from './CliAgentsList';
-import DefaultAgentSettingsCard from './DefaultAgentSettingsCard';
 import IntegrationsCard from './IntegrationsCard';
 import InterfaceSettingsCard from './InterfaceSettingsCard';
 import KeyboardSettingsCard from './KeyboardSettingsCard';
@@ -22,13 +20,7 @@ import TelemetryCard from './TelemetryCard';
 import ThemeCard from './ThemeCard';
 import { UpdateCard } from './UpdateCard';
 
-export type SettingsPageTab =
-  | 'general'
-  | 'account'
-  | 'clis-models'
-  | 'integrations'
-  | 'interface'
-  | 'docs';
+export type SettingsPageTab = 'general' | 'account' | 'integrations' | 'interface' | 'docs';
 
 interface SectionConfig {
   title?: string;
@@ -54,7 +46,6 @@ export function SettingsPage({
   }> = [
     { id: 'general', label: 'General' },
     { id: 'account', label: 'Account' },
-    { id: 'clis-models', label: 'Agents' },
     { id: 'integrations', label: 'Integrations' },
     { id: 'interface', label: 'Interface' },
     { id: 'docs', label: 'Docs', isExternal: true },
@@ -101,21 +92,6 @@ export function SettingsPage({
       title: 'Account',
       description: 'Manage your Rocky account.',
       sections: [{ component: <AccountTab /> }],
-    },
-    'clis-models': {
-      title: 'Agents',
-      description: 'Manage CLI agents and model configurations.',
-      sections: [
-        { component: <DefaultAgentSettingsCard /> },
-        {
-          title: 'CLI agents',
-          component: (
-            <div className="bg-muted/10 rounded-xl border border-border/60 p-2">
-              <CliAgentsList />
-            </div>
-          ),
-        },
-      ],
     },
     integrations: {
       title: 'Integrations',
