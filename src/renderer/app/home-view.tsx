@@ -1,9 +1,11 @@
 import { ArrowUp } from 'lucide-react';
+import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
 import { Titlebar } from '@renderer/lib/components/titlebar/Titlebar';
 import { EmdashShimmerLogo } from '@renderer/lib/emdash-shimmer-logo';
 import { useTheme } from '@renderer/lib/hooks/useTheme';
 import { useShowModal } from '@renderer/lib/modal/modal-provider';
+import { appState } from '@renderer/lib/stores/app-state';
 import { Button } from '@renderer/lib/ui/button';
 import { Textarea } from '@renderer/lib/ui/textarea';
 
@@ -18,10 +20,12 @@ export function HomeTitlebar() {
   return <Titlebar />;
 }
 
-export function HomeMainPanel() {
+export const HomeMainPanel = observer(function HomeMainPanel() {
   const showAddProjectModal = useShowModal('addProjectModal');
   const { effectiveTheme } = useTheme();
   const isDark = effectiveTheme === 'emdark';
+
+  const hasWorkspaces = appState.projects.projects.size > 0;
 
   const [text, setText] = useState('');
 
@@ -34,6 +38,33 @@ export function HomeMainPanel() {
   const fillChip = (chip: string) => {
     setText(chip);
   };
+
+  if (!hasWorkspaces) {
+    return (
+      <div className="flex h-full flex-col overflow-y-auto bg-background text-foreground">
+        <div className="container mx-auto flex min-h-full max-w-2xl flex-1 flex-col items-center justify-center px-8 py-12">
+          {/* Logo mark */}
+          <div className="mb-6 flex items-center justify-center">
+            <EmdashShimmerLogo
+              height={24}
+              color={isDark ? 'var(--color-background-2)' : 'var(--color-foreground)'}
+              shimmerColor={isDark ? 'white' : 'var(--color-foreground-passive)'}
+            />
+          </div>
+
+          {/* First-run heading */}
+          <h1 className="mb-2 text-center text-2xl font-medium tracking-tight text-foreground">
+            Let's get you set up
+          </h1>
+          <p className="mb-8 text-center text-sm text-foreground-muted">
+            Create a workspace to start chatting with Rocky.
+          </p>
+
+          <Button onClick={() => showAddProjectModal({})}>Create workspace</Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex h-full flex-col overflow-y-auto bg-background text-foreground">
@@ -102,7 +133,7 @@ export function HomeMainPanel() {
       </div>
     </div>
   );
-}
+});
 
 export const homeView = {
   TitlebarSlot: HomeTitlebar,

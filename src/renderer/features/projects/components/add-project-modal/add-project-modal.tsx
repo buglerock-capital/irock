@@ -226,17 +226,12 @@ export const AddProjectModal = observer(function AddProjectModal({
         : rpc.projects.inspectProjectPath({ type: 'local', path: pickState.path }),
     enabled: shouldCheckPickPathStatus,
   });
-  const requiresGitInitialization =
-    mode === 'pick' &&
-    pickPathStatusQuery.data?.isDirectory === true &&
-    pickPathStatusQuery.data.isGitRepo === false;
   const isCheckingPickPathStatus = shouldCheckPickPathStatus && pickPathStatusQuery.isPending;
 
   const canSubmit =
     activeMode.isValid &&
     (strategy === 'local' || !!selectedConnectionId) &&
     !isCheckingPickPathStatus &&
-    (!requiresGitInitialization || pickState.initGitRepository) &&
     submitState === 'idle';
 
   const handleSubmit = async () => {
@@ -257,7 +252,7 @@ export const AddProjectModal = observer(function AddProjectModal({
           mode: 'pick',
           name: pickState.name,
           path: pickState.path,
-          initGitRepository: pickState.initGitRepository,
+          initGitRepository: true,
         };
         break;
       case 'new':
@@ -346,7 +341,6 @@ export const AddProjectModal = observer(function AddProjectModal({
             strategy={strategy}
             connectionId={selectedConnectionId}
             state={pickState}
-            showInitializeGitPrompt={requiresGitInitialization}
           />
         )}
         {mode === 'new' && (
