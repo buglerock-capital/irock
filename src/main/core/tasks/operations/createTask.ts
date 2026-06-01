@@ -46,12 +46,18 @@ export async function createTask(
     case 'new-branch': {
       // The FE resolves the final branch name before submission via resolveTaskBranchName.
       taskBranch = strategy.taskBranch;
-      const repoInfo = await project.repository.getRepositoryInfo();
+      let repoInfo = await project.repository.getRepositoryInfo();
       if (repoInfo.isUnborn) {
-        return err({
-          type: 'initial-commit-required',
-          branch: repoInfo.currentBranch ?? params.sourceBranch.branch,
-        });
+        // Auto-create an initial empty commit so branch operations can proceed.
+        try {
+          await project.ctx.exec('git', ['commit', '--allow-empty', '-m', 'Initial commit']);
+        } catch {
+          return err({
+            type: 'initial-commit-required',
+            branch: repoInfo.currentBranch ?? params.sourceBranch.branch,
+          });
+        }
+        repoInfo = await project.repository.getRepositoryInfo();
       }
       const createResult = await project.repository.createBranch(
         taskBranch,
