@@ -8,7 +8,6 @@ import {
   useWorkspace,
   useWorkspaceViewModel,
 } from '@renderer/features/tasks/task-view-context';
-import { useFeatureFlag } from '@renderer/lib/hooks/useFeatureFlag';
 import { PaneSizingProvider } from '@renderer/lib/pty/pane-sizing-context';
 import { PtyPane } from '@renderer/lib/pty/pty-pane';
 import { TerminalSearchOverlay } from '@renderer/lib/pty/terminal-search-overlay';
@@ -19,7 +18,6 @@ import type { ConversationStore } from './conversation-manager';
 
 export const ConversationsPanel = observer(function ConversationsPanel() {
   const { taskId } = useTaskViewContext();
-  const chatUiEnabled = useFeatureFlag('chat-ui');
   const taskView = useWorkspaceViewModel();
   const conversations = useConversations();
   const workspace = useWorkspace();
@@ -102,7 +100,7 @@ export const ConversationsPanel = observer(function ConversationsPanel() {
         >
           <PaneSizingProvider paneId={`conversations-${groupId}`} sessionIds={allSessionIds}>
             <div className="flex min-h-0 flex-1 flex-col">
-              {chatUiEnabled && activeConversation ? (
+              {activeConversation ? (
                 <ChatPanel conversationId={activeConversation.data.id} taskId={taskId} />
               ) : activeSessionId && activeSession?.status === 'ready' && activeSession.pty ? (
                 <div ref={terminalContainerRef} className="relative flex h-full min-h-0 flex-1">
