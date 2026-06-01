@@ -83,6 +83,12 @@ export type AgentProviderDefinition = {
   invertInDark?: boolean;
   terminalOnly?: boolean;
   supportsHooks?: boolean;
+  /** Which chat adapter normalizes this agent's output. Unset → 'raw' fallback (later phase). */
+  chatAdapter?: 'claude-json' | 'raw';
+  /** Args to run the agent headless / in structured-output mode (no interactive TUI). */
+  headlessArgs?: string[];
+  /** True if the agent accepts further turns without a fresh spawn (else resume per turn). */
+  supportsFollowup?: boolean;
 };
 
 export const AGENT_PROVIDERS: AgentProviderDefinition[] = [
@@ -126,6 +132,9 @@ export const AGENT_PROVIDERS: AgentProviderDefinition[] = [
     alt: 'Claude Code',
     terminalOnly: true,
     supportsHooks: true,
+    chatAdapter: 'claude-json',
+    headlessArgs: ['-p', '--output-format', 'stream-json', '--verbose'],
+    supportsFollowup: false,
   },
   {
     id: 'grok',

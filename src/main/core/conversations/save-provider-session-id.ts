@@ -10,18 +10,10 @@ import {
 } from '@shared/conversation-config';
 import { conversationChangedChannel } from '@shared/events/conversationEvents';
 
-export async function saveProviderSessionId(
+async function writeProviderSessionId(
   conversationId: string,
   providerSessionId: string
 ): Promise<void> {
-  if (!isDroidProviderSessionId(providerSessionId)) {
-    log.warn('saveProviderSessionId: ignored invalid Droid session id', {
-      conversationId,
-      providerSessionId,
-    });
-    return;
-  }
-
   const [row] = await db
     .select({
       config: conversations.config,
@@ -53,4 +45,28 @@ export async function saveProviderSessionId(
     projectId: row.projectId,
     changes: { providerSessionId },
   });
+}
+
+export async function saveProviderSessionId(
+  conversationId: string,
+  providerSessionId: string
+): Promise<void> {
+  if (!isDroidProviderSessionId(providerSessionId)) {
+    log.warn('saveProviderSessionId: ignored invalid Droid session id', {
+      conversationId,
+      providerSessionId,
+    });
+    return;
+  }
+
+  await writeProviderSessionId(conversationId, providerSessionId);
+}
+
+export async function persistChatProviderSessionId(
+  conversationId: string,
+  providerSessionId: string
+): Promise<void> {
+  if (!providerSessionId) return;
+
+  await writeProviderSessionId(conversationId, providerSessionId);
 }

@@ -227,13 +227,13 @@ export const TaskList = observer(function TaskList() {
           </ToggleGroup>
           <div className="flex items-center gap-2">
             <SearchInput
-              placeholder="Search tasks…"
+              placeholder="Search conversations…"
               value={taskView.searchQuery}
               onChange={(e) => taskView.setSearchQuery(e.target.value)}
               className="flex-1"
             />
             <Button onClick={() => showCreateTaskModal({ projectId })}>
-              Create Task <BoundShortcut settingsKey="newTask" />
+              New Conversation <BoundShortcut settingsKey="newTask" />
             </Button>
           </div>
         </div>

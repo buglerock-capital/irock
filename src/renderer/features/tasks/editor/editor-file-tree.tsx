@@ -159,16 +159,11 @@ const FileTreeRow = observer(function FileTreeRow({
     e.stopPropagation();
     if (node.type === 'directory') {
       toggleExpand();
-    } else {
-      taskView.tabManager.openFilePreview(node.path);
     }
   };
 
   const handleDoubleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (node.type === 'file') {
-      taskView.tabManager.openFile(node.path);
-    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -176,8 +171,6 @@ const FileTreeRow = observer(function FileTreeRow({
       e.preventDefault();
       if (node.type === 'directory') {
         toggleExpand();
-      } else {
-        taskView.tabManager.openFilePreview(node.path);
       }
     }
   };

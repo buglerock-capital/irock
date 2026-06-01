@@ -4,7 +4,6 @@ import {
   ChevronDown,
   Clock,
   FileDiff,
-  FolderOpen,
   GitBranch,
   Pin,
   RefreshCcw,
@@ -375,18 +374,6 @@ const ActiveTaskTitlebar = observer(function ActiveTaskTitlebar({
               />
               <TooltipContent>
                 Changes <BoundShortcut settingsKey="sidebarChanges" variant="badge" />
-              </TooltipContent>
-            </Tooltip>
-            <Tooltip>
-              <TooltipTrigger
-                render={
-                  <ToggleGroupItem size="icon-sm" value="files" aria-label="Files">
-                    <FolderOpen className="size-3.5" />
-                  </ToggleGroupItem>
-                }
-              />
-              <TooltipContent>
-                Files <BoundShortcut settingsKey="sidebarFiles" variant="badge" />
               </TooltipContent>
             </Tooltip>
             <Tooltip>

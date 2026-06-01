@@ -43,7 +43,6 @@ export function createTaskCommandProvider(projectId: string, taskId: string): Co
       const newConversationDef = taskDef('task.newConversation');
       const sidebarChangesDef = taskDef('task.sidebarChanges');
       const sidebarConversationsDef = taskDef('task.sidebarConversations');
-      const sidebarFilesDef = taskDef('task.sidebarFiles');
       const viewTerminalsDef = taskDef('task.viewTerminals');
       const toggleTerminalDrawerDef = taskDef('task.toggleTerminalDrawer');
       const toggleRightSidebarDef = taskDef('task.toggleRightSidebar');
@@ -95,17 +94,6 @@ export function createTaskCommandProvider(projectId: string, taskId: string): Co
           group: sidebarConversationsDef.group,
           execute() {
             taskView?.setSidebarTab('conversations');
-            taskView?.setSidebarCollapsed(false);
-          },
-        },
-        {
-          id: sidebarFilesDef.id,
-          label: sidebarFilesDef.label,
-          description: sidebarFilesDef.description,
-          shortcutKey: sidebarFilesDef.shortcutKey,
-          group: sidebarFilesDef.group,
-          execute() {
-            taskView?.setSidebarTab('files');
             taskView?.setSidebarCollapsed(false);
           },
         },

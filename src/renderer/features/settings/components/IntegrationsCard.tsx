@@ -115,7 +115,7 @@ const IntegrationsCard: React.FC = () => {
       } else {
         toast({
           title: 'GitHub CLI disconnected',
-          description: 'Emdash no longer has access to GitHub',
+          description: 'Rocky no longer has access to GitHub',
         });
       }
     } finally {

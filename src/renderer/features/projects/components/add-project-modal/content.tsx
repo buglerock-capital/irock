@@ -8,7 +8,6 @@ import { Input } from '@renderer/lib/ui/input';
 import { Label } from '@renderer/lib/ui/label';
 import { RadioGroup, RadioGroupItem } from '@renderer/lib/ui/radio-group';
 import { Separator } from '@renderer/lib/ui/separator';
-import { Switch } from '@renderer/lib/ui/switch';
 import { type Strategy } from './add-project-modal';
 import { LocalDirectorySelector } from './local-directory-selector';
 import { type CloneModeState, type NewModeState, type PickModeState } from './modes';
@@ -18,24 +17,22 @@ export function PickExistingPanel({
   strategy,
   connectionId,
   state,
-  showInitializeGitPrompt,
 }: {
   strategy: Strategy;
   connectionId?: string;
   state: PickModeState;
-  showInitializeGitPrompt: boolean;
 }) {
   const nameId = useId();
   return (
     <FieldGroup>
       <Field>
-        <FieldLabel>Directory</FieldLabel>
+        <FieldLabel>Folder</FieldLabel>
         {strategy === 'local' ? (
           <LocalDirectorySelector
             path={state.path}
             onPathChange={state.handlePathChange}
-            title="Select a local project"
-            message="Select a project directory to open"
+            title="Select a folder"
+            message="Select a folder to open as a workspace"
           />
         ) : (
           <RemoteDirectorySelector
@@ -46,30 +43,14 @@ export function PickExistingPanel({
         )}
       </Field>
       <Field>
-        <FieldLabel htmlFor={nameId}>Name</FieldLabel>
+        <FieldLabel htmlFor={nameId}>Workspace Name</FieldLabel>
         <Input
           id={nameId}
-          placeholder="Enter a project name"
+          placeholder="Enter a workspace name"
           value={state.name}
           onChange={(e) => state.handleNameChange(e.target.value)}
         />
       </Field>
-      {showInitializeGitPrompt && (
-        <div className="overflow-hidden rounded-md border border-border">
-          <p className="border-b border-border bg-background-1 px-2 py-1 text-xs text-foreground-muted">
-            This directory is not a git repository.
-          </p>
-          <div className="p-2">
-            <Field orientation="horizontal">
-              <Switch
-                checked={state.initGitRepository}
-                onCheckedChange={state.setinitGitRepository}
-              />
-              <FieldLabel>Initialize git repository</FieldLabel>
-            </Field>
-          </div>
-        </div>
-      )}
     </FieldGroup>
   );
 }
@@ -146,22 +127,22 @@ export function CreateNewPanel({
       <Separator className="w-full" />
       <FieldGroup>
         <Field>
-          <FieldLabel htmlFor={projectNameId}>Project Name</FieldLabel>
+          <FieldLabel htmlFor={projectNameId}>Workspace Name</FieldLabel>
           <Input
             id={projectNameId}
-            placeholder="Enter a project name"
+            placeholder="Enter a workspace name"
             value={state.name}
             onChange={(e) => state.handleNameChange(e.target.value)}
           />
         </Field>
         <Field>
-          <FieldLabel>{strategy === 'local' ? 'Project Directory' : 'Remote Directory'}</FieldLabel>
+          <FieldLabel>{strategy === 'local' ? 'Folder' : 'Remote Directory'}</FieldLabel>
           {strategy === 'local' ? (
             <LocalDirectorySelector
               path={state.path}
               onPathChange={state.setPath}
-              title="Select a local project"
-              message="Select a project directory to open"
+              title="Select a folder"
+              message="Select a folder to open as a workspace"
             />
           ) : (
             <RemoteDirectorySelector
@@ -204,22 +185,22 @@ export function ClonePanel({
       <Separator className="w-full" />
       <FieldGroup>
         <Field>
-          <FieldLabel htmlFor={projectNameId}>Project Name</FieldLabel>
+          <FieldLabel htmlFor={projectNameId}>Workspace Name</FieldLabel>
           <Input
             id={projectNameId}
-            placeholder="Enter a project name"
+            placeholder="Enter a workspace name"
             value={state.name}
             onChange={(e) => state.handleNameChange(e.target.value)}
           />
         </Field>
         <Field>
-          <FieldLabel>{strategy === 'local' ? 'Project Directory' : 'Remote Directory'}</FieldLabel>
+          <FieldLabel>{strategy === 'local' ? 'Folder' : 'Remote Directory'}</FieldLabel>
           {strategy === 'local' ? (
             <LocalDirectorySelector
               path={state.path}
               onPathChange={state.setPath}
-              title="Select a local project"
-              message="Select a project directory to open"
+              title="Select a folder"
+              message="Select a folder to open as a workspace"
             />
           ) : (
             <RemoteDirectorySelector

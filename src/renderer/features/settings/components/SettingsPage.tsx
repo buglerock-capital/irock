@@ -4,16 +4,10 @@ import { PageHeader } from '@renderer/lib/components/page-header';
 import { rpc } from '@renderer/lib/ipc';
 import { cn } from '@renderer/utils/utils';
 import { AccountTab } from './AccountTab';
-import { CliAgentsList } from './CliAgentsList';
-import DefaultAgentSettingsCard from './DefaultAgentSettingsCard';
-import HiddenToolsSettingsCard from './HiddenToolsSettingsCard';
 import IntegrationsCard from './IntegrationsCard';
 import InterfaceSettingsCard from './InterfaceSettingsCard';
 import KeyboardSettingsCard from './KeyboardSettingsCard';
 import NotificationSettingsCard from './NotificationSettingsCard';
-import RepositorySettingsCard from './RepositorySettingsCard';
-import ResourceMonitorSettingsCard from './ResourceMonitorSettingsCard';
-import { SshConnectionsSettingsCard } from './SshConnectionsSettingsCard';
 import {
   AutoGenerateTaskNamesRow,
   AutoTrustWorktreesRow,
@@ -23,19 +17,10 @@ import {
   PreserveTaskNameCapitalizationRow,
 } from './TaskSettingsRows';
 import TelemetryCard from './TelemetryCard';
-import TerminalSettingsCard from './TerminalSettingsCard';
 import ThemeCard from './ThemeCard';
 import { UpdateCard } from './UpdateCard';
 
-export type SettingsPageTab =
-  | 'general'
-  | 'account'
-  | 'clis-models'
-  | 'integrations'
-  | 'connections'
-  | 'repository'
-  | 'interface'
-  | 'docs';
+export type SettingsPageTab = 'general' | 'account' | 'integrations' | 'interface' | 'docs';
 
 interface SectionConfig {
   title?: string;
@@ -61,10 +46,7 @@ export function SettingsPage({
   }> = [
     { id: 'general', label: 'General' },
     { id: 'account', label: 'Account' },
-    { id: 'clis-models', label: 'Agents' },
     { id: 'integrations', label: 'Integrations' },
-    { id: 'connections', label: 'Connections' },
-    { id: 'repository', label: 'Repository' },
     { id: 'interface', label: 'Interface' },
     { id: 'docs', label: 'Docs', isExternal: true },
   ];
@@ -108,52 +90,21 @@ export function SettingsPage({
     },
     account: {
       title: 'Account',
-      description: 'Manage your Emdash account.',
+      description: 'Manage your Rocky account.',
       sections: [{ component: <AccountTab /> }],
-    },
-    'clis-models': {
-      title: 'Agents',
-      description: 'Manage CLI agents and model configurations.',
-      sections: [
-        { component: <DefaultAgentSettingsCard /> },
-        {
-          title: 'CLI agents',
-          component: (
-            <div className="bg-muted/10 rounded-xl border border-border/60 p-2">
-              <CliAgentsList />
-            </div>
-          ),
-        },
-      ],
     },
     integrations: {
       title: 'Integrations',
       description: 'Connect external services and tools.',
       sections: [{ title: 'Integrations', component: <IntegrationsCard /> }],
     },
-    connections: {
-      title: 'Connections',
-      description: 'Manage reusable SSH connections for remote projects.',
-      sections: [{ component: <SshConnectionsSettingsCard /> }],
-    },
-    repository: {
-      title: 'Repository',
-      description: 'Configure repository and branch settings.',
-      sections: [{ title: 'Branch prefix', component: <RepositorySettingsCard /> }],
-    },
     interface: {
       title: 'Interface',
       description: 'Customize the appearance and behavior of the app.',
       sections: [
         { component: <ThemeCard /> },
-        { component: <TerminalSettingsCard /> },
-        { component: <ResourceMonitorSettingsCard /> },
         { component: <InterfaceSettingsCard /> },
         { title: 'Keyboard shortcuts', component: <KeyboardSettingsCard /> },
-        {
-          title: 'Tools',
-          component: <HiddenToolsSettingsCard />,
-        },
       ],
     },
   };

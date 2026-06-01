@@ -16,7 +16,7 @@ import { getMainWindow } from './window';
 function copyInstallationId(): void {
   const instanceId = telemetryService.getInstanceId() ?? 'unavailable';
   const lines = [
-    `Emdash ${app.getVersion()}`,
+    `Rocky ${app.getVersion()}`,
     `Installation ID: ${instanceId}`,
     `Platform: ${process.platform} ${process.arch}`,
     `Electron: ${process.versions.electron}`,

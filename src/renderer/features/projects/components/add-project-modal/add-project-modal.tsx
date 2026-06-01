@@ -1,5 +1,4 @@
 import { useQuery } from '@tanstack/react-query';
-import { Home, Server } from 'lucide-react';
 import { observer } from 'mobx-react-lite';
 import { useMemo, useState } from 'react';
 import { SshConnectionSelector } from '@renderer/features/projects/components/add-project-modal/ssh-connection-selector';
@@ -31,8 +30,6 @@ import {
 } from '@renderer/lib/ui/dialog';
 import { Field, FieldLabel } from '@renderer/lib/ui/field';
 import { ModalLayout } from '@renderer/lib/ui/modal-layout';
-import { ToggleGroup, ToggleGroupItem } from '@renderer/lib/ui/toggle-group';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@renderer/lib/ui/tooltip';
 import { log } from '@renderer/utils/logger';
 import { ClonePanel, CreateNewPanel, PickExistingPanel } from './content';
 import { useCloneMode, useNewMode, usePickMode } from './modes';
@@ -48,13 +45,14 @@ export interface AddProjectModalProps extends BaseModalProps<void> {
 }
 
 export const AddProjectModal = observer(function AddProjectModal({
-  strategy: strategyProp,
-  mode: modeProp,
+  strategy: _strategyProp,
+  mode: _modeProp,
   onClose,
   connectionId: connectionIdProp,
 }: AddProjectModalProps) {
-  const [strategy, setStrategy] = useState<Strategy>(strategyProp ?? 'local');
-  const [mode, setMode] = useState<Mode>(modeProp ?? 'pick');
+  // Local-folder only: SSH and clone/new modes are not exposed to users.
+  const strategy = 'local' as Strategy;
+  const mode = 'pick' as Mode;
   const [connectionId, setConnectionId] = useState<string | undefined>(connectionIdProp);
   const [submitState, setSubmitState] = useState<'idle' | 'creating'>('idle');
   const { connections } = appState.sshConnections;
@@ -228,17 +226,12 @@ export const AddProjectModal = observer(function AddProjectModal({
         : rpc.projects.inspectProjectPath({ type: 'local', path: pickState.path }),
     enabled: shouldCheckPickPathStatus,
   });
-  const requiresGitInitialization =
-    mode === 'pick' &&
-    pickPathStatusQuery.data?.isDirectory === true &&
-    pickPathStatusQuery.data.isGitRepo === false;
   const isCheckingPickPathStatus = shouldCheckPickPathStatus && pickPathStatusQuery.isPending;
 
   const canSubmit =
     activeMode.isValid &&
     (strategy === 'local' || !!selectedConnectionId) &&
     !isCheckingPickPathStatus &&
-    (!requiresGitInitialization || pickState.initGitRepository) &&
     submitState === 'idle';
 
   const handleSubmit = async () => {
@@ -259,7 +252,7 @@ export const AddProjectModal = observer(function AddProjectModal({
           mode: 'pick',
           name: pickState.name,
           path: pickState.path,
-          initGitRepository: pickState.initGitRepository,
+          initGitRepository: true,
         };
         break;
       case 'new':
@@ -319,7 +312,7 @@ export const AddProjectModal = observer(function AddProjectModal({
     <ModalLayout
       header={
         <DialogHeader showCloseButton={submitState === 'idle'}>
-          <DialogTitle>Add Project</DialogTitle>
+          <DialogTitle>Add Workspace</DialogTitle>
         </DialogHeader>
       }
       footer={
@@ -331,52 +324,6 @@ export const AddProjectModal = observer(function AddProjectModal({
       }
     >
       <DialogContentArea data-autofocus tabIndex={-1} className="gap-4">
-        <div className="flex items-center gap-2">
-          <ToggleGroup
-            className="w-full flex-1"
-            value={[mode]}
-            onValueChange={([value]) => {
-              if (value) setMode(value as Mode);
-            }}
-          >
-            <ToggleGroupItem value="pick" className="flex-1">
-              Pick
-            </ToggleGroupItem>
-            <ToggleGroupItem value="new" className="flex-1">
-              New
-            </ToggleGroupItem>
-            <ToggleGroupItem value="clone" className="flex-1">
-              Clone
-            </ToggleGroupItem>
-          </ToggleGroup>
-          <ToggleGroup
-            value={[strategy]}
-            onValueChange={([value]) => {
-              if (value) setStrategy(value as Strategy);
-            }}
-          >
-            <Tooltip>
-              <TooltipTrigger
-                render={
-                  <ToggleGroupItem value="local" aria-label="Local">
-                    <Home className="size-3.5" />
-                  </ToggleGroupItem>
-                }
-              />
-              <TooltipContent>Local</TooltipContent>
-            </Tooltip>
-            <Tooltip>
-              <TooltipTrigger
-                render={
-                  <ToggleGroupItem value="ssh" aria-label="SSH">
-                    <Server className="size-3.5" />
-                  </ToggleGroupItem>
-                }
-              />
-              <TooltipContent>SSH</TooltipContent>
-            </Tooltip>
-          </ToggleGroup>
-        </div>
         {strategy === 'ssh' && !showGithubAuthDisclaimer && (
           <Field>
             <FieldLabel>SSH Connection</FieldLabel>
@@ -394,7 +341,6 @@ export const AddProjectModal = observer(function AddProjectModal({
             strategy={strategy}
             connectionId={selectedConnectionId}
             state={pickState}
-            showInitializeGitPrompt={requiresGitInitialization}
           />
         )}
         {mode === 'new' && (

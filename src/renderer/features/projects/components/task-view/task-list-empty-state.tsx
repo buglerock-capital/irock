@@ -1,13 +1,10 @@
-import { CircleDot, GitBranch, GitPullRequest, type LucideIcon } from 'lucide-react';
+import { GitBranch, type LucideIcon } from 'lucide-react';
 import { observer } from 'mobx-react-lite';
-import { useIntegrationsContext } from '@renderer/features/integrations/integrations-provider';
-import { getRepositoryStore } from '@renderer/features/projects/stores/project-selectors';
 import { useArrowKeyNavigation } from '@renderer/lib/hooks/use-arrow-key-navigation';
 import { useShowModal } from '@renderer/lib/modal/modal-provider';
 import { ActionListItem } from '@renderer/lib/ui/action-list-item';
-import { isGitHubDotComHost } from '@shared/repository-ref';
 
-type TaskStrategy = 'from-branch' | 'from-issue' | 'from-pull-request';
+type TaskStrategy = 'from-branch';
 
 interface TaskAction {
   label: string;
@@ -24,16 +21,6 @@ export const TaskListEmptyState = observer(function TaskListEmptyState({
   projectId: string;
 }) {
   const showTaskModal = useShowModal('taskModal');
-  const { connectionStatus } = useIntegrationsContext();
-  const repositoryStore = getRepositoryStore(projectId);
-  const supportsPullRequests = Boolean(repositoryStore?.pullRequestRepositoryUrl);
-  const supportsGhesIssues = Boolean(
-    repositoryStore?.issueRepositoryUrl &&
-    repositoryStore.providerRepository?.host &&
-    !isGitHubDotComHost(repositoryStore.providerRepository.host)
-  );
-  const hasAnyIntegration =
-    supportsGhesIssues || Object.values(connectionStatus).some((s) => s.connected);
 
   const actions: TaskAction[] = [
     {
@@ -42,22 +29,6 @@ export const TaskListEmptyState = observer(function TaskListEmptyState({
       icon: GitBranch,
       strategy: 'from-branch',
       disabled: false,
-    },
-    {
-      label: 'Create from Issue',
-      description: 'Link and create a task from an issue',
-      icon: CircleDot,
-      strategy: 'from-issue',
-      disabled: !hasAnyIntegration,
-      disabledReason: 'Configure issue integrations',
-    },
-    {
-      label: 'Create from Pull Request',
-      description: 'Create a task from a pull request',
-      icon: GitPullRequest,
-      strategy: 'from-pull-request',
-      disabled: !supportsPullRequests,
-      disabledReason: 'No remote repository connected',
     },
   ];
 

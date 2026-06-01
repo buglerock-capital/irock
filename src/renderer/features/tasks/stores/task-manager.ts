@@ -110,6 +110,7 @@ export class TaskManagerStore {
   private _disposeRepositoryReaction: (() => void) | null = null;
 
   tasks = observable.map<string, TaskStore>();
+  tasksLoaded = false;
 
   constructor(
     projectId: string,
@@ -121,7 +122,7 @@ export class TaskManagerStore {
     this._repository = repository;
     this._settingsStore = settingsStore;
     this._baseRef = baseRef;
-    makeObservable(this, { tasks: observable });
+    makeObservable(this, { tasks: observable, tasksLoaded: observable });
 
     this._unsubStatusUpdated = events.on(
       taskStatusUpdatedChannel,
@@ -233,6 +234,7 @@ export class TaskManagerStore {
               conversationRegistry.acquire(t.id, this.projectId);
               terminalRegistry.acquire(t.id, this.projectId);
             }
+            this.tasksLoaded = true;
           });
           const reloadPromises = tasks.flatMap((t) => {
             const store = this.tasks.get(t.id);
