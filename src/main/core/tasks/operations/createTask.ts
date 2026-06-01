@@ -48,8 +48,11 @@ export async function createTask(
       taskBranch = strategy.taskBranch;
       let repoInfo = await project.repository.getRepositoryInfo();
       if (repoInfo.isUnborn) {
-        // Auto-create an initial empty commit so branch operations can proceed.
+        // Commit the workspace folder's existing contents as the initial commit so the
+        // task worktree (where the agent runs) contains the user's real files. --allow-empty
+        // keeps this working for a brand-new empty folder too.
         try {
+          await project.ctx.exec('git', ['add', '-A']);
           await project.ctx.exec('git', ['commit', '--allow-empty', '-m', 'Initial commit']);
         } catch {
           return err({
