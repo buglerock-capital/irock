@@ -1,6 +1,5 @@
 import { observer } from 'mobx-react-lite';
 import { useEffect, useRef } from 'react';
-import { SettingsPanel } from '@renderer/features/projects/components/settings-view/settings-panel';
 import { TaskList } from '@renderer/features/projects/components/task-view/task-list';
 import {
   asMounted,
@@ -20,7 +19,6 @@ const autoProvisionedProjects = new Set<string>();
 
 const projectViewItems: Array<{ id: ProjectView; label: string }> = [
   { id: 'tasks', label: 'Conversations' },
-  { id: 'settings', label: 'Settings' },
 ];
 
 function ProjectViewNav({
@@ -137,8 +135,7 @@ export const ActiveProject = observer(function ActiveProject() {
           />
           <div className="min-h-0 min-w-0 flex-1 overflow-x-hidden overflow-y-auto">
             <div className="mx-auto flex h-full min-h-0 w-full max-w-4xl flex-col px-1 py-10">
-              {activeView === 'tasks' && <TaskList />}
-              {activeView === 'settings' && <SettingsPanel />}
+              <TaskList />
             </div>
           </div>
         </div>
