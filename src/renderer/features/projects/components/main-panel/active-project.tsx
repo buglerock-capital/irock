@@ -19,7 +19,7 @@ import { cn } from '@renderer/utils/utils';
 const autoProvisionedProjects = new Set<string>();
 
 const projectViewItems: Array<{ id: ProjectView; label: string }> = [
-  { id: 'tasks', label: 'Tasks' },
+  { id: 'tasks', label: 'Conversations' },
   { id: 'settings', label: 'Settings' },
 ];
 
