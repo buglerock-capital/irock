@@ -63,6 +63,35 @@ vi.mock('@renderer/lib/ui/markdown-renderer', () => ({
     React.createElement('span', null, content),
 }));
 
+// ── Mock task-view-context to avoid TaskViewContext provider requirement ───────
+
+vi.mock('@renderer/features/tasks/task-view-context', () => ({
+  useTaskViewContext: () => ({ projectId: 'p1', taskId: 't1', workspaceId: null }),
+}));
+
+// ── Mock project-selectors to return no SSH connection (local workspace) ──────
+
+vi.mock('@renderer/features/projects/stores/project-selectors', () => ({
+  getProjectSshConnectionId: () => undefined,
+}));
+
+// ── Mock useEffectiveProvider to return a stable provider ────────────────────
+
+vi.mock('@renderer/features/tasks/conversations/use-effective-provider', () => ({
+  useEffectiveProvider: () => ({
+    providerId: 'claude' as const,
+    setProviderOverride: vi.fn(),
+    createDisabled: false,
+  }),
+}));
+
+// ── Mock AgentSelector to a simple label (avoids combobox/dependency chain) ──
+
+vi.mock('@renderer/lib/components/agent-selector/agent-selector', () => ({
+  AgentSelector: ({ value }: { value: string | null }) =>
+    React.createElement('div', { 'data-testid': 'agent-selector' }, value ?? 'No agent'),
+}));
+
 // ── Suite ─────────────────────────────────────────────────────────────────────
 
 describe('ChatPanel', () => {
@@ -71,22 +100,24 @@ describe('ChatPanel', () => {
     mocks.resetCapturedChatCb();
   });
 
-  it('sends a user message via RPC and renders the echoed user bubble', async () => {
+  it('sends a user message via RPC from the empty launcher and renders the echoed user bubble', async () => {
     const screen = await render(<ChatPanel conversationId="c1" taskId="t1" />);
 
-    // Type into the composer textarea.
-    const textarea = screen.getByPlaceholder('Ask the agent to build, fix bugs, explore');
+    // The empty launcher is shown when there are no messages.
+    // Its textarea has a different placeholder than the bottom composer.
+    const textarea = screen.getByPlaceholder('Ask Rocky to build, fix bugs, explore');
     await textarea.fill('hello');
 
-    // Click the Send button.
+    // Click the send button (ArrowUp icon, aria-label="Send").
     const sendButton = screen.getByRole('button', { name: 'Send' });
     await sendButton.click();
 
-    // The RPC call should have been made immediately.
+    // The RPC call should have been made with the chosen provider.
     expect(mocks.sendChatMessage).toHaveBeenCalledWith({
       conversationId: 'c1',
       taskId: 't1',
       text: 'hello',
+      provider: 'claude',
     });
 
     // Simulate the backend echoing the user message via the chat event.

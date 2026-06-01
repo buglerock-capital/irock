@@ -22,6 +22,7 @@ export type SendChatMessageParams = {
   conversationId: string;
   taskId: string;
   text: string;
+  provider?: AgentProviderId;
 };
 
 export async function sendChatMessage(params: SendChatMessageParams): Promise<void> {
@@ -33,13 +34,22 @@ export async function sendChatMessage(params: SendChatMessageParams): Promise<vo
 
   if (!conv) throw new Error(`Conversation ${params.conversationId} not found`);
 
-  const rawProvider = conv.provider ?? 'claude';
+  // If the caller supplies a provider override that differs from the stored one,
+  // persist it to the conversation row before running so it sticks across turns.
+  if (params.provider && params.provider !== conv.provider) {
+    await db
+      .update(conversations)
+      .set({ provider: params.provider })
+      .where(eq(conversations.id, params.conversationId));
+  }
+
+  const rawProvider = params.provider ?? conv.provider ?? 'claude';
   let providerId: AgentProviderId;
   if (isValidProviderId(rawProvider)) {
     providerId = rawProvider;
   } else {
     log.warn('chat: unknown provider on conversation, defaulting to claude', {
-      provider: conv.provider,
+      provider: rawProvider,
     });
     providerId = 'claude';
   }
