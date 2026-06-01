@@ -1,4 +1,4 @@
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, SquareChevronRight } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '@renderer/utils/utils';
 
@@ -14,25 +14,36 @@ export function CommandCard({ command, output, exitCode, running }: Props) {
   const failed = exitCode !== undefined && exitCode !== 0;
 
   return (
-    <div className="my-1 rounded-md border border-foreground/10 text-xs">
+    <div className="py-0.5">
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="flex w-full items-center gap-1.5 px-2 py-1.5 text-left"
+        className="flex w-full items-center gap-2 text-left"
       >
-        <ChevronRight className={cn('size-3 transition-transform', open && 'rotate-90')} />
-        <span className="text-foreground-muted">Ran</span>
-        <code className="truncate font-mono">{command}</code>
+        <SquareChevronRight className="size-3.5 shrink-0 text-foreground-muted" />
+        <span className="text-xs text-foreground-muted">Ran</span>
+        <code className="truncate font-mono text-xs text-foreground-muted">{command}</code>
         {running ? (
-          <span className="ml-auto text-foreground-muted">…</span>
+          <span className="ml-auto text-xs text-foreground-muted">…</span>
         ) : (
-          <span className={cn('ml-auto', failed ? 'text-destructive' : 'text-green-500')}>
-            {failed ? `exit ${exitCode}` : 'done'}
+          <span
+            className={cn(
+              'ml-auto text-xs',
+              failed ? 'text-destructive' : 'text-foreground-muted/70'
+            )}
+          >
+            {failed ? `exit ${exitCode}` : ''}
           </span>
         )}
+        <ChevronRight
+          className={cn(
+            'size-3 shrink-0 text-foreground-muted/50 transition-transform',
+            open && 'rotate-90'
+          )}
+        />
       </button>
       {open && output ? (
-        <pre className="max-h-64 overflow-auto border-t border-foreground/10 px-2 py-1.5 font-mono whitespace-pre-wrap">
+        <pre className="mt-1 max-h-64 overflow-auto rounded-md border border-foreground/10 bg-background-tertiary px-2 py-1.5 font-mono text-xs whitespace-pre-wrap">
           {output}
         </pre>
       ) : null}

@@ -11,8 +11,8 @@ import { Textarea } from '@renderer/lib/ui/textarea';
 import type { AgentProviderId } from '@shared/agent-provider-registry';
 import { chatMessageChannel } from '@shared/events/chatEvents';
 import { ChatStore } from './chat-store';
-import { ChatComposer } from './ChatComposer';
 import { ChatMessageList } from './ChatMessageList';
+import { FollowUpComposer } from './FollowUpComposer';
 
 type Props = {
   conversationId: string;
@@ -147,7 +147,7 @@ export const ChatPanel = observer(function ChatPanel({ conversationId, taskId }:
 
   return (
     <div className="flex h-full flex-col">
-      <div className="min-h-0 flex-1 overflow-auto">
+      <div className="relative min-h-0 flex-1 overflow-auto">
         {isEmpty ? (
           <ChatEmptyLauncher
             conversationId={conversationId}
@@ -157,21 +157,21 @@ export const ChatPanel = observer(function ChatPanel({ conversationId, taskId }:
             connectionId={connectionId}
           />
         ) : (
-          <ChatMessageList messages={store.messages} />
+          <>
+            <ChatMessageList messages={store.messages} providerId={providerId} />
+            <FollowUpComposer
+              onSend={(text) => {
+                void rpc.conversations.sendChatMessage({
+                  conversationId,
+                  taskId,
+                  text,
+                  provider: providerId ?? undefined,
+                });
+              }}
+            />
+          </>
         )}
       </div>
-      {!isEmpty && (
-        <ChatComposer
-          onSend={(text) => {
-            void rpc.conversations.sendChatMessage({
-              conversationId,
-              taskId,
-              text,
-              provider: providerId ?? undefined,
-            });
-          }}
-        />
-      )}
     </div>
   );
 });
